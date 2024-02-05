@@ -1,0 +1,17 @@
+@model IEnumerable<ToDoList.Models.Tag>
+
+@{
+    ViewData["Title"] = "Tags";
+}
+
+<h1>Tags</h1>
+
+<ul>
+@foreach (var tag in Model)
+{
+    <li>@Html.ActionLink(tag.Title, "Details", new { id = tag.TagId })</li>
+}
+</ul>
+
+<p>@Html.ActionLink("Add new tag", "Create")</p>
+<p>@Html.ActionLink("Home", "Index", "Home")</p>

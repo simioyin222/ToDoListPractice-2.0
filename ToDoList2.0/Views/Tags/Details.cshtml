@@ -1,0 +1,25 @@
+@model ToDoList.Models.Tag
+
+@{
+    ViewData["Title"] = "Tag Details";
+}
+
+<h2>Tag Details</h2>
+<h3>@Model.Title</h3>
+
+@if (!Model.JoinEntities.Any())
+{
+    <p>This tag does not belong to any items.</p>
+}
+else
+{
+    <h4>Items:</h4>
+    <ul>
+    @foreach (var join in Model.JoinEntities)
+    {
+        <li>@join.Item.Description</li>
+    }
+    </ul>
+}
+
+<p>@Html.ActionLink("Back to Tags", "Index")</p>
