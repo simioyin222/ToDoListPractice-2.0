@@ -1,16 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoList.Models;
 
-namespace ToDoList.Data
+
+namespace ToDoList.Models
 {
     public class ToDoListContext : DbContext
     {
-        public ToDoListContext(DbContextOptions<ToDoListContext> options)
-            : base(options)
-        {
-        }
-
-        public DbSet<Item> Items { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<ItemTag> ItemTags { get; set; }
+
+        public ToDoListContext(DbContextOptions options) : base(options) { }
     }
 }
