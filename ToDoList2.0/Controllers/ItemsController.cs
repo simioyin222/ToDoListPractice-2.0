@@ -17,8 +17,8 @@ namespace ToDoList.Controllers
 
         public IActionResult Index()
         {
-            var items = _db.Items.Include(item => item.JoinEntities).ThenInclude(join => join.Tag).ToList();
-            return View(items);
+            var sortedItems = _db.Items.OrderBy(item => item.DueDate).ToList();
+            return View(sortedItems);
         }
 
         public IActionResult Details(int id)
