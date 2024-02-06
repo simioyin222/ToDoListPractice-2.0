@@ -1,0 +1,27 @@
+@model ToDoList.Models.Item
+
+@{
+    ViewData["Title"] = "Add a Tag to Item";
+}
+
+<h2>Add a Tag to @Html.DisplayFor(model => model.Description)</h2>
+
+@using (Html.BeginForm("AddTag", "Items", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        @Html.HiddenFor(model => model.ItemId)
+
+        <label for="tagId">Select Tag:</label>
+        @Html.DropDownList("TagId", (SelectList)ViewBag.TagId, "Choose a tag", new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Add Tag" class="btn btn-primary" />
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to Item Details", "Details", new { id = Model.ItemId }, new { @class = "btn btn-default" })
+</div>
