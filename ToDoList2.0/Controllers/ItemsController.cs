@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using ToDoList.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ToDoList.Controllers
 {
@@ -15,124 +15,122 @@ namespace ToDoList.Controllers
             _db = db;
         }
 
+        // GET: Items
         public IActionResult Index()
         {
-            var sortedItems = _db.Items.OrderBy(item => item.DueDate).ToList();
-            return View(sortedItems);
+            var items = _db.Items.Include(i => i.Category).ToList();
+            return View(items);
         }
 
-        public IActionResult Details(int id)
+        // GET: Items/Details/5
+        public IActionResult Details(int? id)
         {
-            var thisItem = _db.Items
-                              .Include(item => item.JoinEntities)
-                              .ThenInclude(join => join.Tag)
-                              .FirstOrDefault(item => item.ItemId == id);
-            if (thisItem == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            return View(thisItem);
+
+            var item = _db.Items
+                .Include(i => i.Category)
+                .FirstOrDefault(m => m.ItemId == id);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
         }
 
+        // GET: Items/Create
         public IActionResult Create()
         {
-            ViewBag.TagId = new SelectList(_db.Tags, "TagId", "Title");
+            ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name");
             return View();
         }
 
+        // POST: Items/Create
         [HttpPost]
-        public IActionResult Create(Item item, int[] tagIds)
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Item item)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name", item.CategoryId);
+                return View(item);
+            }
+            
             _db.Items.Add(item);
             _db.SaveChanges();
-
-            if (tagIds.Length > 0)
-            {
-                foreach (int tagId in tagIds)
-                {
-                    _db.ItemTags.Add(new ItemTag { ItemId = item.ItemId, TagId = tagId });
-                }
-                _db.SaveChanges();
-            }
-
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Edit(int id)
+        // GET: Items/Edit/5
+        public IActionResult Edit(int? id)
         {
-            var thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
-            if (thisItem == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            ViewBag.TagId = new SelectList(_db.Tags, "TagId", "Title");
-            return View(thisItem);
+
+            var item = _db.Items.Find(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name", item.CategoryId);
+            return View(item);
         }
 
+        // POST: Items/Edit/5
         [HttpPost]
-        public IActionResult Edit(Item item, int[] tagIds)
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Item item)
         {
+            if (id != item.ItemId)
+            {
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
                 _db.Update(item);
                 _db.SaveChanges();
-
-                var existingJoins = _db.ItemTags.Where(join => join.ItemId == item.ItemId).ToList();
-                foreach (var join in existingJoins)
-                {
-                    _db.ItemTags.Remove(join);
-                }
-                _db.SaveChanges();
-
-                if (tagIds.Length > 0)
-                {
-                    foreach (int tagId in tagIds)
-                    {
-                        _db.ItemTags.Add(new ItemTag { ItemId = item.ItemId, TagId = tagId });
-                    }
-                    _db.SaveChanges();
-                }
-
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
+            ViewBag.CategoryId = new SelectList(_db.Categories, "CategoryId", "Name", item.CategoryId);
             return View(item);
         }
 
-        public IActionResult Delete(int id)
+        // GET: Items/Delete/5
+        public IActionResult Delete(int? id)
         {
-            var thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
-            if (thisItem == null)
+            if (id == null)
             {
                 return NotFound();
             }
-            return View(thisItem);
+
+            var item = _db.Items
+                .Include(i => i.Category)
+                .FirstOrDefault(m => m.ItemId == id);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            return View(item);
         }
 
+        // POST: Items/Delete/5
         [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
-            _db.Items.Remove(thisItem);
+            var item = _db.Items.Find(id);
+            _db.Items.Remove(item);
             _db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
-        public IActionResult AddTag(int id)
-        {
-            var thisItem = _db.Items.FirstOrDefault(item => item.ItemId == id);
-            ViewBag.TagId = new SelectList(_db.Tags, "TagId", "Title");
-            return View(thisItem);
-        }
-
-        [HttpPost]
-        public IActionResult AddTag(Item item, int tagId)
-        {
-            if (tagId != 0)
-            {
-                _db.ItemTags.Add(new ItemTag { TagId = tagId, ItemId = item.ItemId });
-                _db.SaveChanges();
-            }
-            return RedirectToAction("Details", new { id = item.ItemId });
+            return RedirectToAction(nameof(Index));
         }
     }
 }
