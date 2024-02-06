@@ -4,22 +4,29 @@
     ViewData["Title"] = "Tag Details";
 }
 
-<h2>Tag Details</h2>
-<h3>@Model.Title</h3>
+<h2>Tag Details: @Model.Title</h2>
 
-@if (!Model.JoinEntities.Any())
+@if (Model.JoinEntities != null && Model.JoinEntities.Any())
 {
-    <p>This tag does not belong to any items.</p>
+    <h3>Items with this Tag:</h3>
+    <ul>
+        @foreach (var join in Model.JoinEntities)
+        {
+            <li>@join.Item.Description</li>
+        }
+    </ul>
 }
 else
 {
-    <h4>Items:</h4>
-    <ul>
-    @foreach (var join in Model.JoinEntities)
-    {
-        <li>@join.Item.Description</li>
-    }
-    </ul>
+    <p>This tag is not associated with any items.</p>
 }
 
-<p>@Html.ActionLink("Back to Tags", "Index")</p>
+<!-- Edit Tag Link -->
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.TagId" class="btn btn-primary">Edit Tag</a>
+</div>
+
+<!-- Back to Tags List Link -->
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

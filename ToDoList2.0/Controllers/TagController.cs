@@ -26,6 +26,10 @@ namespace ToDoList.Controllers
                 .Include(tag => tag.JoinEntities)
                 .ThenInclude(join => join.Item)
                 .FirstOrDefault(tag => tag.TagId == id);
+            if (thisTag == null)
+            {
+                return NotFound();
+            }
             return View(thisTag);
         }
 
@@ -39,27 +43,48 @@ namespace ToDoList.Controllers
         {
             _db.Tags.Add(tag);
             _db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult AddItem(int id)
+        public IActionResult Edit(int id)
         {
-            var thisTag = _db.Tags.FirstOrDefault(tag => tag.TagId == id);
-            ViewBag.ItemId = new SelectList(_db.Items, "ItemId", "Description");
+            var thisTag = _db.Tags.FirstOrDefault(tags => tags.TagId == id);
+            if (thisTag == null)
+            {
+                return NotFound();
+            }
             return View(thisTag);
         }
 
         [HttpPost]
-        public IActionResult AddItem(Tag tag, int itemId)
+        public IActionResult Edit(Tag tag)
         {
-            if (!_db.ItemTags.Any(join => join.ItemId == itemId && join.TagId == tag.TagId))
+            if (ModelState.IsValid)
             {
-                _db.ItemTags.Add(new ItemTag { ItemId = itemId, TagId = tag.TagId });
+                _db.Entry(tag).State = EntityState.Modified;
                 _db.SaveChanges();
+                return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction("Details", new { id = tag.TagId });
+            return View(tag);
         }
 
-        // Additional actions for Edit, Delete, etc., can be added here as needed.
+        public IActionResult Delete(int id)
+        {
+            var thisTag = _db.Tags.FirstOrDefault(tags => tags.TagId == id);
+            if (thisTag == null)
+            {
+                return NotFound();
+            }
+            return View(thisTag);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var thisTag = _db.Tags.FirstOrDefault(tags => tags.TagId == id);
+            _db.Tags.Remove(thisTag);
+            _db.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
