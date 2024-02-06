@@ -4,29 +4,24 @@
     ViewData["Title"] = "Tag Details";
 }
 
-<h2>Tag Details: @Model.Title</h2>
+<h2>@Model.Title</h2>
 
-@if (Model.JoinEntities != null && Model.JoinEntities.Any())
+@if (Model.JoinEntities.Any())
 {
-    <h3>Items with this Tag:</h3>
     <ul>
-        @foreach (var join in Model.JoinEntities)
-        {
-            <li>@join.Item.Description</li>
-        }
+    @foreach (var join in Model.JoinEntities)
+    {
+        <li>
+            @join.Item.Description
+            @using (Html.BeginForm("DeleteJoin", "Tags", new { joinId = join.ItemTagId }, FormMethod.Post))
+            {
+                <input type="submit" value="Remove association" class="btn btn-warning"/>
+            }
+        </li>
+    }
     </ul>
 }
-else
-{
-    <p>This tag is not associated with any items.</p>
-}
 
-<!-- Edit Tag Link -->
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.TagId" class="btn btn-primary">Edit Tag</a>
-</div>
-
-<!-- Back to Tags List Link -->
-<div>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</div>
+<a asp-action="Edit" asp-route-id="@Model.TagId">Edit Tag</a> |
+<a asp-action="Delete" asp-route-id="@Model.TagId">Delete Tag</a> |
+<a asp-action="Index">Back to List</a>
