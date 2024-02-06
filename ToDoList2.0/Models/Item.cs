@@ -8,31 +8,25 @@ namespace ToDoList.Models
     public class Item
     {
         public int ItemId { get; set; }
-        
-        [Required(ErrorMessage = "Please enter a description.")]
-        public string Description { get; set; }
-        
-        [Display(Name = "Completed")]
-        public bool IsCompleted { get; set; } = false; // Default to false for new items
-        
-        [DataType(DataType.Date)]
-        [Display(Name = "Due Date")]
-        public DateTime DueDate { get; set; }
 
-        // Assuming a foreign key relationship with a Category
-        [Display(Name = "Category")]
+        [Required(ErrorMessage = "The item's description can't be empty!")]
+        public string Description { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "You must add your item to a category. Have you created a category yet?")]
         public int CategoryId { get; set; }
-        
-        // Navigation property for the related Category
+
         public virtual Category Category { get; set; }
         
-        // For a many-to-many relationship with Tags
+        [DataType(DataType.Date)]
+        public DateTime DueDate { get; set; }
+        public bool IsCompleted { get; set; }
+        
         public virtual ICollection<ItemTag> JoinEntities { get; set; }
 
-        // Constructor to initialize the collection property
+        // Constructor to initialize the collection to prevent null reference exceptions
         public Item()
         {
-            this.JoinEntities = new HashSet<ItemTag>();
+            JoinEntities = new HashSet<ItemTag>();
         }
     }
 }

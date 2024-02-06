@@ -1,20 +1,26 @@
 @model IEnumerable<ToDoList.Models.Item>
 
-<table class="table">
+<h2>Items</h2>
+
+<table>
     <thead>
         <tr>
             <th>Description</th>
             <th>Due Date</th>
             <th>Completed</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
     @foreach (var item in Model)
     {
         <tr>
-            <td>@item.Description</td>
-            <td>@item.DueDate.ToShortDateString()</td>
-            <td>@item.IsCompleted</td>
+            <td>@Html.DisplayFor(modelItem => item.Description)</td>
+            <td>@Html.DisplayFor(modelItem => item.DueDate.ToShortDateString())</td>
+            <td>@Html.DisplayFor(modelItem => item.IsCompleted)</td>
+            <td>
+                <!-- Action links like Edit, Details, Delete -->
+            </td>
         </tr>
     }
     </tbody>
