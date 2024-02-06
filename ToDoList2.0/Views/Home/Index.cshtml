@@ -1,11 +1,43 @@
+@model Dictionary<string, object>
+
 @{
-    Layout = "_Layout";
+    ViewData["Title"] = "Home Page";
 }
 
-<h1>Welcome to the ToDoList Application</h1>
+<h1>Welcome to the To Do List!</h1>
 
-<p>This is a simple To Do List application where you can manage your tasks, categories, and tags.</p>
+<h4>Categories</h4>
+@if (((List<ToDoList.Models.Category>)Model["categories"]).Count == 0)
+{
+    <p>No categories have been added yet!</p>
+}
+else
+{
+    <ul>
+    @foreach (var cat in (List<ToDoList.Models.Category>)Model["categories"])
+    {
+        <li>@Html.ActionLink(cat.Name, "Details", "Categories", new { id = cat.CategoryId }, null)</li>
+    }
+    </ul>
+}
 
-<p>@Html.ActionLink("View Tasks", "Index", "Items")</p>
-<p>@Html.ActionLink("View Categories", "Index", "Categories")</p>
-<p>@Html.ActionLink("See all tags", "Index", "Tags")</p>
+<h4>Items</h4>
+@if (((List<ToDoList.Models.Item>)Model["items"]).Count == 0)
+{
+    <p>No items have been added yet!</p>
+}
+else
+{
+    <ul>
+    @foreach (var item in (List<ToDoList.Models.Item>)Model["items"])
+    {
+        <li>@Html.ActionLink(item.Description, "Details", "Items", new { id = item.ItemId }, null)</li>
+    }
+    </ul>
+}
+
+<hr />
+
+<p>@Html.ActionLink("Manage items", "Index", "Items")</p>
+<p>@Html.ActionLink("Manage categories", "Index", "Categories")</p>
+<p>@Html.ActionLink("Manage tags", "Index", "Tags")</p>
