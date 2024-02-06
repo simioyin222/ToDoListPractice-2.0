@@ -1,0 +1,21 @@
+@model IEnumerable<ToDoList.Models.Item>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th>Completed</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Description</td>
+            <td>@item.DueDate.ToShortDateString()</td>
+            <td>@item.IsCompleted</td>
+        </tr>
+    }
+    </tbody>
+</table>
